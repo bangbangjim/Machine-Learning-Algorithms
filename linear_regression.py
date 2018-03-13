@@ -9,7 +9,7 @@ Build logistic regression class to find the optimum theta using gradient descent
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge
 from scipy.stats import linregress
 
 class Linear_regression():
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     plt.plot(list(losses.keys()), list(losses.values()), marker = "o")
     #compare my regression line with sklearn and scipy regression line
     plt.figure()
-    ax1 = plt.subplot(111)
+    ax1 = plt.subplot(211)
     ax1.set_title("X1 vs y")
     ax1.set_xlabel("X1")
     ax1.set_ylabel("y").set_rotation(0)
@@ -76,6 +76,7 @@ if __name__ == "__main__":
     
     clf = LinearRegression()
     clf = clf.fit(X, y)
+
     m, c = clf.coef_[0], clf.intercept_
     ax1.plot(X1, list(map(lambda x: m*x + c, X1)), label = "sklearn LinearRegression ({0}x + {1})".format(round(m,4), round(c,4)), marker = "x", color = "r", linewidth = 2) 
 #    m, c = linregress(X1.flatten(), y)[:2]
@@ -84,24 +85,24 @@ if __name__ == "__main__":
     ax1.legend()
     ax1.grid()
     
-# =============================================================================
-#     ax2 = plt.subplot(212)
-#     ax2.set_title("X2 vs y")
-#     ax2.set_xlabel("X2")
-#     ax2.set_ylabel("y").set_rotation(0)
-#     ax2.scatter(X2.flatten(), y)
-#     
-#     clf = LinearRegression()
-#     clf = clf.fit(X, y)
-#     m, c = clf.coef_[0], clf.intercept_
-#     ax2.plot(X2, list(map(lambda x: m*x + c, X2)), label = "sklearn", marker = "x") 
-#     m, c = linregress(X2.flatten(), y)[:2]
-#     ax2.scatter(X2, list(map(lambda x: m*x + c, X2)), label = "scipy")
-#     ax2.plot(X2, list(map(lambda x: thetas[0][1]*x + thetas[0][0], X2)), label = "gradient descent", linestyle = "--")   
-#     ax2.legend()
-#     ax2.grid()
-#     
-# =============================================================================
+    
+    
+    ax2 = plt.subplot(212)
+    ax2.set_title("X2 vs y")
+    ax2.set_xlabel("X2")
+    ax2.set_ylabel("y").set_rotation(0)
+    ax2.scatter(X2.flatten(), y)
+    
+    clf = LinearRegression()
+    clf = clf.fit(X, y)
+    m, c = clf.coef_[0], clf.intercept_
+    ax2.plot(X2, list(map(lambda x: m*x + c, X2)), label = "sklearn LinearRegression ({0}x + {1})".format(round(m,4), round(c,4)), marker = "x") 
+#    m, c = linregress(X2.flatten(), y)[:2]
+#    ax2.scatter(X2, list(map(lambda x: m*x + c, X2)), label = "scipy")
+    ax2.plot(X2, list(map(lambda x: thetas[0][1]*x + thetas[0][0], X2)), label ="gradient descent ({0}x + {1})".format(round(thetas[0][1], 4), round(thetas[0][0],4)), linestyle = "--")   
+    ax2.legend()
+    ax2.grid()
+    
     #compare result when there is only one feature
     
     
