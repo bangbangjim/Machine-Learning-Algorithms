@@ -35,7 +35,7 @@ class Linear_regression():
         #2 
         thetas = np.zeros((1, self.X.shape[1]))    
         #3
-        for _ in range(500000):
+        for _ in range(1000000):
             M = self.X.shape[0] # number of training example
             if _ %5000 == 0:
                 loss =  0.5/M * np.sum((np.dot(thetas, self.X.T) - self.y)**2)
@@ -77,10 +77,10 @@ if __name__ == "__main__":
     clf = LinearRegression()
     clf = clf.fit(X, y)
     m, c = clf.coef_[0], clf.intercept_
-    ax1.plot(X1, list(map(lambda x: m*x + c, X1)), label = "sklearn", marker = "x", color = "r", linewidth = 2) 
+    ax1.plot(X1, list(map(lambda x: m*x + c, X1)), label = "sklearn LinearRegression ({0}x + {1})".format(round(m,4), round(c,4)), marker = "x", color = "r", linewidth = 2) 
 #    m, c = linregress(X1.flatten(), y)[:2]
 #    ax1.scatter(X1, list(map(lambda x: m*x + c, X1)), label = "scipy")
-    ax1.plot(X1, list(map(lambda x: thetas[0][1]*x + thetas[0][0], X1)), label = "gradient descent", linestyle = "--", color = "orange", linewidth = 3)   
+    ax1.plot(X1, list(map(lambda x: thetas[0][1]*x + thetas[0][0], X1)), label = "gradient descent ({0}x + {1})".format(round(thetas[0][1], 4),  round(thetas[0][0],4)), linestyle = "--", color = "orange", linewidth = 3)   
     ax1.legend()
     ax1.grid()
     
