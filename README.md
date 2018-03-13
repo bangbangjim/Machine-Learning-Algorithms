@@ -27,5 +27,5 @@ Lastly consider the below case using 2 features; the results is still consistent
 
 [comparison_1]: https://github.com/bangbangjim/Machine-Learning-Algorithms/blob/master/images/comparison%20sklearn.png "Comparison of sklearn LinearRegression and self-built gradient descent algorithm"
 
-[comparison_2]: https://github.com/bangbangjim/Machine-Learning-Algorithms/blob/master/images/comparison%20sklearn%202%20features.png "Comparison (2 features)"
+[comparison_2]: https://github.com/bangbangjim/Machine-Learning-Algorithms/blob/master/images/comparison%202%20sklearn.png "Comparison (2 features)"
 
