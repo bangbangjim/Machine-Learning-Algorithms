@@ -52,7 +52,7 @@ if __name__ == "__main__":
     X2 = np.array([i*2 for i in range(100)]).reshape(100,1)
     X = np.concatenate((X1,X2), axis = 1)   
  
-    X = X1
+#    X = X1
     
     noise = 5* np.random.normal(0,1,X1.shape) + 500
     y = (X1 + noise).flatten()
@@ -95,11 +95,11 @@ if __name__ == "__main__":
     
     clf = LinearRegression()
     clf = clf.fit(X, y)
-    m, c = clf.coef_[0], clf.intercept_
+    m, c = clf.coef_[1], clf.intercept_
     ax2.plot(X2, list(map(lambda x: m*x + c, X2)), label = "sklearn LinearRegression ({0}x + {1})".format(round(m,4), round(c,4)), marker = "x") 
 #    m, c = linregress(X2.flatten(), y)[:2]
 #    ax2.scatter(X2, list(map(lambda x: m*x + c, X2)), label = "scipy")
-    ax2.plot(X2, list(map(lambda x: thetas[0][1]*x + thetas[0][0], X2)), label ="gradient descent ({0}x + {1})".format(round(thetas[0][1], 4), round(thetas[0][0],4)), linestyle = "--")   
+    ax2.plot(X2, list(map(lambda x: thetas[0][2]*x + thetas[0][0], X2)), label ="gradient descent ({0}x + {1})".format(round(thetas[0][2], 4), round(thetas[0][0],4)), linestyle = "--")   
     ax2.legend()
     ax2.grid()
     
