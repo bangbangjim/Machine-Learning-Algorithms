@@ -4,7 +4,7 @@ Created on Tue Mar 13 17:19:05 2018
 
 @author: user
 
-Build logistic regression class to find the optimum theta using gradient descent.
+Build linear regression class to find the optimum theta using gradient descent.
 """
 
 import numpy as np
@@ -47,7 +47,7 @@ class Linear_regression():
         
         
 if __name__ == "__main__":
-    # create a fairly linear dataset with 1 feature
+    # create a fairly linear dataset
     X1 = np.array([i for i in range(100)]).reshape(100,1)
     X2 = np.array([i*2 for i in range(100)]).reshape(100,1)
     X = np.concatenate((X1,X2), axis = 1)   
