@@ -5,6 +5,9 @@ Created on Tue Mar 13 17:19:05 2018
 @author: user
 
 Build linear regression class to find the optimum theta using gradient descent.
+TODO:
+    1. compare cost function of ridge and my own code
+    2. try visualise (3D) stochastic gradient descent (* smaller number of iter needed as it iterates through every sample size) and batch gradient descent
 """
 
 import numpy as np
@@ -38,12 +41,16 @@ class Linear_regression():
         for _ in range(1000000):
             M = self.X.shape[0] # number of training example
             if _ %5000 == 0:
-                loss =  0.5/M * np.sum((np.dot(thetas, self.X.T) - self.y)**2)
+                loss =  0.5/M * (np.sum((np.dot(thetas, self.X.T) - self.y)**2) + self.lamb * np.sum(thetas**2))
                 self.loss_vs_iter[_] = loss
             gradient = (1/M) * np.dot((np.dot(thetas, self.X.T) - self.y), self.X)
             #4
             thetas = thetas - self.alpha * (gradient + (self.lamb/M) * thetas)
         return (thetas, self.loss_vs_iter)
+    def SGD(self):
+        '''
+        create stochastic gradient descent 
+        '''
         
         
 if __name__ == "__main__":
