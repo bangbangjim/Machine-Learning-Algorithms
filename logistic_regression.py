@@ -14,7 +14,9 @@ Created on Tue Mar 13 17:19:05 2018
 Build logistic regression class to find the optimum theta using gradient descent.
 TODO:
     1. plot x vs y on the resulting theta 
-    3. try skewing the classes
+    2. try skewing the classes
+    3. compare to sklearn.
+    4. stochastic 
 """
 
 import numpy as np
