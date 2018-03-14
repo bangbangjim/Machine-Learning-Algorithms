@@ -2,12 +2,12 @@
 Building machine learning algorithms from scratch (Python 3.6)
 
 TODO:
-- [x] Linear regression (gradient descent)
+- [x] Linear regression (batch and stochastic gradient descent)
 - [ ] Logistic regression
 - [ ] Neural Network
 - [ ] Support Vector Machines
 ## Linear Regression
-Given a set of features represented as vector X, the optimised weight vector Θ (with bias included) is found by performing gradient descent. Consider the following case with only one feature:
+Given a set of features represented as vector X, the optimised weight vector Θ (with bias included) is found by performing batch gradient descent. Consider the following case with only one feature:
 
 The algorithm is confirmed to be working properly as the loss converges wrt to the number of iteration.
 
