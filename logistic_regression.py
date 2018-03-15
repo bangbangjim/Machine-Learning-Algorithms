@@ -26,6 +26,9 @@ from sklearn.linear_model import LinearRegression, Ridge, LogisticRegression
 from scipy.stats import linregress
 import logging
 from sklearn.datasets import load_breast_cancer
+import pandas as pd
+from sklearn import preprocessing
+#from mpl_toolkits.mplot3d import Axes3D
 
 logging.basicConfig(filename='logistic_regression.log',level=logging.DEBUG)
 
@@ -62,27 +65,27 @@ class Logistic_regression():
         thetas = np.zeros((1, self.X.shape[1])).flatten()
 
         #4
-        for n in range(1):
+        for n in range(self.num_iter):
             M = self.X.shape[0]
             loss =  0
             for i in range(M):
                 # compute cost function
                 h = self.sigmoid(np.dot(thetas, self.X[i]))  
-                print (h)
+#                logging.debug(h)
 #                loss += 0.5* (h - self.y[i])**2
                 loss += -1* np.sum(self.y[i] * np.log(h) + (1-self.y[i])* np.log(1-h)) + (self.lamb/2) * np.sum(thetas **2)
-                print (loss)
+#                logging.debug(loss)
                 #perform gradient descent
-                gradient = (self.sigmoid(np.dot(thetas, self.X[i])) - self.y[i]) * self.X[i]
-                print (gradient)
+                gradient = (h - self.y[i]) * self.X[i]
+#                logging.debug(gradient)
                 thetas = thetas - self.alpha * (gradient + (self.lamb/2) * thetas)
-                print (thetas)
-                self.loss_vs_iter[(n+1)*M] = (1/M)*loss
+#                logging.debug(thetas)
+#                self.loss_vs_iter[(n+1)*M] = (1/M)*loss
 
-#            if n % 30 == 0:
-#                self.loss_vs_iter[(n+1)*M] = (1/M)*np.float(loss)
-#                
-#                    
+            if n % 30 == 0:
+                self.loss_vs_iter[(n+1)*M] = (1/M)*np.float(loss)
+                
+                    
         return (thetas, self.loss_vs_iter)
         
                    
@@ -121,9 +124,10 @@ if __name__ == "__main__":
     
 
         
-    C = Logistic_regression(X1, y, 0.01, 0, 100000)
+    C = Logistic_regression(X1, y, 0.01, 0, 1000000)
     thetas, losses = C.gradient_descent()
-    D = Logistic_regression(X1, y, 0.01, 0, int(100000/X1.shape[0]))
+    print ("C done")
+    D = Logistic_regression(X1, y, 0.003, 0, 20000)
     t, l = D.SGD()
     
     clf = LogisticRegression()
@@ -140,6 +144,7 @@ if __name__ == "__main__":
     plt.grid()
     plt.plot(list(losses.keys()), list(losses.values()), marker = "o", label = "batch")
     plt.plot(list(l.keys()), list(l.values()), marker = "x", label = "stochastic")
+    plt.legend()
     # plot X vs y of the result model
     plt.figure()
     x = np.array([[1,i] for i in range(100)]).reshape(100,2)
@@ -150,6 +155,59 @@ if __name__ == "__main__":
     plt.plot(x_wihout_bias, clf.predict(x_wihout_bias), label = "sklearn LogisticRegression thetas: "+ ", ".join(map(lambda x: str(round(x,2)), [m,c])))
     
     plt.legend()
+    plt.grid()
+    plt.title("Logistic Regression")
+    plt.ylabel("y").set_rotation(0)
+    plt.xlabel("X1")
+    
+    #create a dataset with 2 features where a decision boundary can be drawn
+    
+    X1 = np.array([[i,] for i in range(100) if i < 40 or i >= 60])
+    noise = np.random.normal(0,1, X1.shape) * 10 
+    X2 = X1.copy() + noise
+    X = np.concatenate((X1,X2), axis = 1)
+    y = np.array([[0,] if np.product(i) <2500 else [1,] for i in X])
+    
+    #plot the data to confirm there is a decision boundary
+    plt.figure()
+    plt.scatter(np.array([X1[i] for i in range(len(X1)) if y[i] == 0]), np.array([X2[i] for i in range(len(X2)) if y[i] == 0]))
+    plt.scatter(np.array([X1[i] for i in range(len(X1)) if y[i] == 1]), np.array([X2[i] for i in range(len(X2)) if y[i] == 1]))
+    
+         
+    ax1.scatter(X1.flatten(), X2.flatten(), y.flatten())
+    ax1.set_ylabel = "X2"
+    ax1.set_xlabel = "X1"
+    ax1.set_zlabel = "label"
+    
+    clf = LogisticRegression()
+    clf = clf.fit(X, y.flatten())
+    
+    X_test = np.array([[i,i] for i in range(100)])
+    y_test = clf.predict(X_test)
+    
+    # plot the graph of sklearn , my own algo to a 3d graph
+    fig = plt.figure()
+    ax1 = fig.gca(projection = "3d")    
+    ax1.plot([i for i in range(100)], [i for i in range(100)], y_test)    
+    
+    #todo - build cost function 3d graph to demonstrate gradient descent
+    fig = plt.figure()
+    ax1 = fig.gca(projection = "3d")    
+    
+    
+# =============================================================================
+#     dataset = load_breast_cancer()
+#     df = pd.DataFrame(data = dataset["data"], columns = load_breast_cancer()["feature_names"])
+#     y = pd.DataFrame(data = dataset["target"], columns = [["label"]]).values
+#     # only use the first two features for simplication purpose
+#     X = df[df.columns[:2]]
+#     
+# =============================================================================
+    #plot the 3D graph to confirm that the data 
+    
+    
+    
+    
     
 # =============================================================================
 #     #compare my regression line with sklearn and scipy regression line
