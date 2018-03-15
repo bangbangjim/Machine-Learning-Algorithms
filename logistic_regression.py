@@ -16,12 +16,13 @@ TODO:
     1. plot x vs y on the resulting theta 
     2. try skewing the classes
     3. compare to sklearn.
-    4. stochastic 
+    4. stochastic - done
+    5. plot 3d graph of gradient descent of batch and stoch
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.linear_model import LinearRegression, Ridge, LogisticRegression
 from scipy.stats import linregress
 import logging
 from sklearn.datasets import load_breast_cancer
@@ -42,7 +43,49 @@ class Logistic_regression():
         h = 1/(1+np.exp(-z))
         return h
         
+    def SGD(self):
+        '''
+        1. add a bias feature which is always equal to 1.
+        2. randomly shuffle the dataset (X and y)
+        3. set all thetas as 0 (number of theta is the number of features + 1 (bias))        
+        4. iteratively, compute the gradient for each sample size.
+        5. update all thetas after each computation.
+        6. repeat until a certain number of iteration or until the gradient reach almost 0.
+        '''
+        #1, #2
+        self.X = np.concatenate((np.ones((self.X.shape[0], 1)), self.X), axis = 1)
+        dataset = np.concatenate((self.X, self.y), axis = 1)
+        np.random.shuffle(dataset)
+        self.X = np.array([[i[0],i[1]] for i in dataset])
+        self.y = np.array([[i[2],] for i in dataset])
+        #3
+        thetas = np.zeros((1, self.X.shape[1])).flatten()
+
+        #4
+        for n in range(1):
+            M = self.X.shape[0]
+            loss =  0
+            for i in range(M):
+                # compute cost function
+                h = self.sigmoid(np.dot(thetas, self.X[i]))  
+                print (h)
+#                loss += 0.5* (h - self.y[i])**2
+                loss += -1* np.sum(self.y[i] * np.log(h) + (1-self.y[i])* np.log(1-h)) + (self.lamb/2) * np.sum(thetas **2)
+                print (loss)
+                #perform gradient descent
+                gradient = (self.sigmoid(np.dot(thetas, self.X[i])) - self.y[i]) * self.X[i]
+                print (gradient)
+                thetas = thetas - self.alpha * (gradient + (self.lamb/2) * thetas)
+                print (thetas)
+                self.loss_vs_iter[(n+1)*M] = (1/M)*loss
+
+#            if n % 30 == 0:
+#                self.loss_vs_iter[(n+1)*M] = (1/M)*np.float(loss)
+#                
+#                    
+        return (thetas, self.loss_vs_iter)
         
+                   
     def gradient_descent(self):
         '''
         
@@ -57,7 +100,6 @@ class Logistic_regression():
         self.X = np.concatenate((np.ones((self.X.shape[0], 1)), self.X), axis = 1)
         #2 
         thetas = np.zeros((1, self.X.shape[1]))    
-        #3
         for _ in range(self.num_iter):
             M = self.X.shape[0] # number of training example
             if _ %5000 == 0:
@@ -66,8 +108,8 @@ class Logistic_regression():
                 h = self.sigmoid(np.dot(thetas, self.X.T))                 
                 loss = (-1/M) * np.sum(self.y.T * np.log(h) + (1-self.y.T) * np.log(1-h)) + (self.lamb/(2*M)) * np.sum(thetas**2)
                 self.loss_vs_iter[_] = loss
+            #3, #4 perform gradient descent
             gradient = (1/M) * np.dot((self.sigmoid(np.dot(thetas, self.X.T)) - self.y.T), self.X)
-            #4
             thetas = thetas - self.alpha * (gradient + (self.lamb/M) * thetas)
         return (thetas, self.loss_vs_iter)
         
@@ -81,17 +123,33 @@ if __name__ == "__main__":
         
     C = Logistic_regression(X1, y, 0.01, 0, 100000)
     thetas, losses = C.gradient_descent()
-    # plot loss vs number of iteration
+    D = Logistic_regression(X1, y, 0.01, 0, int(100000/X1.shape[0]))
+    t, l = D.SGD()
+    
+    clf = LogisticRegression()
+    clf = clf.fit(X1, y.flatten())
+    m, c = map(np.float, [clf.coef_, clf.intercept_])
+    
+    
+    
+    # plot loss vs number of iteration for batch and stochastic
     plt.figure()
     plt.title("loss vs number of iteration")
     plt.ylabel("loss")
     plt.xlabel("number of iteration")
     plt.grid()
-    plt.plot(list(losses.keys()), list(losses.values()), marker = "o")
+    plt.plot(list(losses.keys()), list(losses.values()), marker = "o", label = "batch")
+    plt.plot(list(l.keys()), list(l.values()), marker = "x", label = "stochastic")
     # plot X vs y of the result model
     plt.figure()
     x = np.array([[1,i] for i in range(100)]).reshape(100,2)
-    plt.plot([i[1] for i in x], C.sigmoid(np.dot(thetas, x.T)).flatten())
+    plt.scatter(X1, y)
+    plt.plot([i[1] for i in x], C.sigmoid(np.dot(thetas, x.T)).flatten(), label = "batch thetas: " + (str([round(x,2) for x in thetas.flatten()])))
+    plt.plot([i[1] for i in x], D.sigmoid(np.dot(t, x.T)).flatten(), label = "stochastic thetas: " + (str([round(x,2) for x in t.flatten()])))
+    x_wihout_bias = np.array([i[1] for i in x]).reshape(-1,1)
+    plt.plot(x_wihout_bias, clf.predict(x_wihout_bias), label = "sklearn LogisticRegression thetas: "+ ", ".join(map(lambda x: str(round(x,2)), [m,c])))
+    
+    plt.legend()
     
 # =============================================================================
 #     #compare my regression line with sklearn and scipy regression line
