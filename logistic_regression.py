@@ -28,11 +28,13 @@ import logging
 from sklearn.datasets import load_breast_cancer
 import pandas as pd
 from sklearn import preprocessing
-#from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D
 
 logging.basicConfig(filename='logistic_regression.log',level=logging.DEBUG)
 
 class Logistic_regression():
+    
+    thetas = None
     
     
     def __init__(self, X, y, alpha, lamb, num_iter):
@@ -42,9 +44,15 @@ class Logistic_regression():
         self.lamb = lamb
         self.num_iter =num_iter
         self.loss_vs_iter = {}
+        
     def sigmoid(self, z = np.array):
         h = 1/(1+np.exp(-z))
         return h
+        
+    def predict(self, X):
+        y = self.sigmoid(np.dot(thetas, X.T)).flatten()
+        return y
+        
         
     def SGD(self):
         '''
@@ -149,8 +157,8 @@ if __name__ == "__main__":
     plt.figure()
     x = np.array([[1,i] for i in range(100)]).reshape(100,2)
     plt.scatter(X1, y)
-    plt.plot([i[1] for i in x], C.sigmoid(np.dot(thetas, x.T)).flatten(), label = "batch thetas: " + (str([round(x,2) for x in thetas.flatten()])))
-    plt.plot([i[1] for i in x], D.sigmoid(np.dot(t, x.T)).flatten(), label = "stochastic thetas: " + (str([round(x,2) for x in t.flatten()])))
+    plt.plot([i[1] for i in x], C.predict(x), label = "batch thetas: " + (str([round(x,2) for x in thetas.flatten()])))
+    plt.plot([i[1] for i in x], D.predict(x), label = "stochastic thetas: " + (str([round(x,2) for x in t.flatten()])))
     x_wihout_bias = np.array([i[1] for i in x]).reshape(-1,1)
     plt.plot(x_wihout_bias, clf.predict(x_wihout_bias), label = "sklearn LogisticRegression thetas: "+ ", ".join(map(lambda x: str(round(x,2)), [m,c])))
     
@@ -159,7 +167,7 @@ if __name__ == "__main__":
     plt.title("Logistic Regression")
     plt.ylabel("y").set_rotation(0)
     plt.xlabel("X1")
-    
+ #-------------------------------------------------------------------------------------------------   
     #create a dataset with 2 features where a decision boundary can be drawn
     
     X1 = np.array([[i,] for i in range(100) if i < 40 or i >= 60])
@@ -173,11 +181,12 @@ if __name__ == "__main__":
     plt.scatter(np.array([X1[i] for i in range(len(X1)) if y[i] == 0]), np.array([X2[i] for i in range(len(X2)) if y[i] == 0]))
     plt.scatter(np.array([X1[i] for i in range(len(X1)) if y[i] == 1]), np.array([X2[i] for i in range(len(X2)) if y[i] == 1]))
     
-         
-    ax1.scatter(X1.flatten(), X2.flatten(), y.flatten())
-    ax1.set_ylabel = "X2"
-    ax1.set_xlabel = "X1"
-    ax1.set_zlabel = "label"
+    # compute the parameters using self-built class or sklearn
+    C = Logistic_regression(X, y, 0.01, 0, 1000000)
+    thetas, losses = C.gradient_descent()
+    
+    D = Logistic_regression(X1, y, 0.003, 0, 20000)
+    t, l = D.SGD()
     
     clf = LogisticRegression()
     clf = clf.fit(X, y.flatten())
@@ -188,9 +197,22 @@ if __name__ == "__main__":
     # plot the graph of sklearn , my own algo to a 3d graph
     fig = plt.figure()
     ax1 = fig.gca(projection = "3d")    
-    ax1.plot([i for i in range(100)], [i for i in range(100)], y_test)    
+    ax1.scatter(X1, X2, y.flatten(), label = "training data")
+    ax1.plot([i for i in range(100)], [i for i in range(100)], y_test, label = "sklearn logistic regression")    
     
+    ax1.plot([i for i in range(100)], [i for i in range(100)], C.predict(np.array([[1,i,i] for i in range(100)])), label = "self-built logistic regression - batch gradient descent", marker = "x")
+    ax1.plot([i for i in range(100)], [i for i in range(100)], D.predict(np.array([[1,i,i] for i in range(100)])), label = "self-built logistic regression - stochastic gradient descent", marker = "o")
+   
+    ax1.set_title("label vs X", fontsize = 20).set_position([0.5,1])
+    ax1.set_xlabel("X1", fontsize = 20, labelpad = 20)
+    ax1.set_ylabel("X2", fontsize = 20, labelpad = 20)
+    ax1.set_zlabel("label", fontsize = 20, labelpad = 20)
+    
+    
+    ax1.legend()
+
     #todo - build cost function 3d graph to demonstrate gradient descent
+    
     fig = plt.figure()
     ax1 = fig.gca(projection = "3d")    
     
@@ -205,49 +227,4 @@ if __name__ == "__main__":
 # =============================================================================
     #plot the 3D graph to confirm that the data 
     
-    
-    
-    
-    
-# =============================================================================
-#     #compare my regression line with sklearn and scipy regression line
-#     plt.figure()
-#     ax1 = plt.subplot(211)
-#     ax1.set_title("X1 vs y")
-#     ax1.set_xlabel("X1")
-#     ax1.set_ylabel("y").set_rotation(0)
-#     ax1.scatter(X1.flatten(), y)
-#     
-#     clf = LinearRegression()
-#     clf = clf.fit(X, y)
-# 
-#     m, c = clf.coef_[0], clf.intercept_
-#     ax1.plot(X1, list(map(lambda x: m*x + c, X1)), label = "sklearn LinearRegression ({0}x + {1})".format(round(m,4), round(c,4)), marker = "x", color = "r", linewidth = 2) 
-# #    m, c = linregress(X1.flatten(), y)[:2]
-# #    ax1.scatter(X1, list(map(lambda x: m*x + c, X1)), label = "scipy")
-#     ax1.plot(X1, list(map(lambda x: thetas[0][1]*x + thetas[0][0], X1)), label = "gradient descent ({0}x + {1})".format(round(thetas[0][1], 4),  round(thetas[0][0],4)), linestyle = "--", color = "orange", linewidth = 3)   
-#     ax1.legend()
-#     ax1.grid()
-#     
-#     
-#     
-#     ax2 = plt.subplot(212)
-#     ax2.set_title("X2 vs y")
-#     ax2.set_xlabel("X2")
-#     ax2.set_ylabel("y").set_rotation(0)
-#     ax2.scatter(X2.flatten(), y)
-#     
-#     clf = LinearRegression()
-#     clf = clf.fit(X, y)
-#     m, c = clf.coef_[1], clf.intercept_
-#     ax2.plot(X2, list(map(lambda x: m*x + c, X2)), label = "sklearn LinearRegression ({0}x + {1})".format(round(m,4), round(c,4)), marker = "x") 
-# #    m, c = linregress(X2.flatten(), y)[:2]
-# #    ax2.scatter(X2, list(map(lambda x: m*x + c, X2)), label = "scipy")
-#     ax2.plot(X2, list(map(lambda x: thetas[0][2]*x + thetas[0][0], X2)), label ="gradient descent ({0}x + {1})".format(round(thetas[0][2], 4), round(thetas[0][0],4)), linestyle = "--")   
-#     ax2.legend()
-#     ax2.grid()
-#     
-#     #compare result when there is only one feature
-#     
-#     
-# =============================================================================
+
