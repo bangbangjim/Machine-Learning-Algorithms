@@ -8,12 +8,14 @@ Build linear regression class to find the optimum theta using gradient descent.
 TODO:
     1. compare cost function of ridge and my own code
     2. try visualise (3D) stochastic gradient descent (* smaller number of iter needed as it iterates through every sample size) and batch gradient descent
+    3. test lamb on higher order polynormial data
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression, Ridge
 from scipy.stats import linregress
+from sklearn.model_selection import train_test_split
 
 class Linear_regression():
     
@@ -58,7 +60,7 @@ if __name__ == "__main__":
     X1 = np.array([i for i in range(100)]).reshape(100,1)
     X2 = np.array([i*2 for i in range(100)]).reshape(100,1)
     X = np.concatenate((X1,X2), axis = 1)   
- 
+    
 #    X = X1
     
     noise = 5* np.random.normal(0,1,X1.shape) + 500
