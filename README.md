@@ -30,4 +30,4 @@ Lastly consider the below case using 2 features; the results is still consistent
 [comparison_2]: https://github.com/bangbangjim/Machine-Learning-Algorithms/blob/master/images/comparison%202%20sklearn.png "Comparison (2 features)"
 
 ## Logistic Regression
-Please see the Jupyter Notebook for detail
+Please see the Jupyter Notebook for details.
