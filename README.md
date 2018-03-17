@@ -3,7 +3,7 @@ Building machine learning algorithms from scratch (Python 3.6)
 
 TODO:
 - [x] Linear regression (batch and stochastic gradient descent)
-- [ ] Logistic regression
+- [x] Logistic regression
 - [ ] Neural Network
 - [ ] Support Vector Machines
 ## Linear Regression
@@ -29,3 +29,5 @@ Lastly consider the below case using 2 features; the results is still consistent
 
 [comparison_2]: https://github.com/bangbangjim/Machine-Learning-Algorithms/blob/master/images/comparison%202%20sklearn.png "Comparison (2 features)"
 
+## Logistic Regression
+Please see the Jupyter Notebook for detail
