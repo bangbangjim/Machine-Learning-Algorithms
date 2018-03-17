@@ -2,7 +2,7 @@
 Building machine learning algorithms from scratch (Python 3.6)
 
 TODO:
-- [x] Linear regression (batch and stochastic gradient descent)
+- [x] Linear regression
 - [x] Logistic regression
 - [ ] Neural Network
 - [ ] Support Vector Machines
