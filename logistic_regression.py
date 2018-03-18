@@ -97,7 +97,7 @@ class Logistic_regression():
                 output_difference = h - self.y[i]
 
                 gradient =  output_difference * self.X[i]
-                self.thetas = self.thetas - self.alpha * (gradient + (self.lamb/2) * np.sum(self.thetas))
+                self.thetas = self.thetas - self.alpha * (gradient + (self.lamb/2) * self.thetas)
                 loss += -1* np.sum(self.y[i] * np.log(h) + (1-self.y[i])* np.log(1-h)) + (self.lamb/2) * np.sum(self.thetas **2)
                 Xs.append(self.thetas)
                 Zs.append(loss)              
@@ -139,7 +139,7 @@ class Logistic_regression():
 #            gradient = (1/M) * np.dot(output_difference, self.X)
             gradient = np.dot(output_difference, self.X)
 #            self.thetas = self.thetas - self.alpha * (gradient + (self.lamb/M) * self.thetas)
-            self.thetas = self.thetas - self.alpha * (gradient + (self.lamb) * np.sum(self.thetas))
+            self.thetas = self.thetas - self.alpha * (gradient + (self.lamb) * self.thetas)
             
             if step %100 == 0:
 #            if step < 10000:
@@ -169,14 +169,172 @@ class Logistic_regression():
          h[h == 0] = 0.0000000001                
          loss = (-1/M) * np.sum(self.y.T * np.log(h) + (1-self.y.T) * np.log(1-h),axis = 1) + (self.lamb/(2*M)) * np.sum(thetas_set**2)
 
-         return (x, y, loss.reshape(x.size, y.size)) 
-    def decision_boundary(self, x = np.array, y = np.array):
-        '''return z values for plotting decision boundary'''
-        if type(self.thetas) == None:
-            self.gradient_descent()
-        else:
-            pass
-        Xs = np.array([[i,j] for i in x for j in y])
-        z = self.predict(Xs).reshape(x.size, y.size)
-        return z
+         return (x, y, loss.reshape(x.size, y.size))  
          
+         
+        
+if __name__ == "__main__":
+# =============================================================================
+#     # create a simple dataset with 1 feature (x) where if x <50 y = 0, else y = 1
+#     X1 = np.array([[i,] for i in range(0,100,2)])
+#     y = np.array([[0,] if i <50 else [1,] for i in X1])
+#      
+#     C = Logistic_regression(X1, y, 0.001, 0, 1000000)
+#     thetas, losses, Xs, Zs= C.gradient_descent()
+# 
+#     clf = LogisticRegression(C = 1e30)
+#     clf = clf.fit(X1, y.flatten())
+#     m, c = map(np.float, [clf.coef_, clf.intercept_])
+#     
+#     
+#     
+#     # plot loss vs number of iteration for batch and stochastic
+#     plt.figure()
+#     plt.title("loss vs number of iteration")
+#     plt.ylabel("loss")
+#     plt.xlabel("number of iteration")
+#     plt.grid()
+# #    losses = {i:j for (i,j) in losses.items() if np.isnan(j) == False}
+#     plt.plot(list(losses.keys()), list(losses.values()), marker = "o", label = "batch")
+#     plt.legend()
+#     # plot X vs y of the result model
+#     plt.figure()
+#     x_test = np.array([[i,] for i in range(1,101,2)])
+#     y_test  = np.array([0 if i <50 else 1 for i in x_test.flatten()])
+#     plt.scatter(x_test, y_test, color = "g", label = "test data")
+#     plt.plot(x_test.flatten(), C.predict(x_test), label = "batch thetas: " + ", ".join(map(lambda x: str(round(x,2)), thetas.flatten().tolist())), marker = "x")
+#     plt.plot(x_test.flatten(), clf.predict(x_test), label = "sklearn LogisticRegression thetas: "+ ", ".join(map(lambda x: str(round(x,2)), [c,m])))
+#     
+#     
+#     plt.legend()
+#     plt.grid()
+#     plt.title("Logistic Regression")
+#     plt.ylabel("y").set_rotation(0)
+#     plt.xlabel("X1")
+# 
+#     print ("sklearn accuracy: " + str(clf.score(x_test, y_test)))
+#     print ("self-built accuracy: " + str(C.score(x_test, y_test)))
+# =============================================================================
+
+ #-------------------------------------------------------------------------------------------------   
+    #create a dataset with 2 features where a decision boundary can be drawn
+    
+    np.random.seed(12)
+    
+    X1 = np.random.multivariate_normal([5, 0], [[0.75, 3],[3, 0.75]], 2500)
+    X2 = np.random.multivariate_normal([0, 5], [[0.75, 3],[3, 0.75]], 2500)
+    X = np.concatenate((X1,X2), axis = 0) 
+
+    y = np.concatenate((np.zeros(2500), np.ones(2500)), axis = 0)  
+    
+    #plot the data to confirm there is a decision boundary
+    plt.figure()
+    plt.scatter(np.array([i[0] for i in X]), np.array([i[1] for i in X]), c = y.flatten(), alpha = 0.7)
+    plt.xlabel("X1")
+    plt.ylabel("X2")   
+# =============================================================================
+#     np.random.seed(12)
+#     X1 = np.array([[i,] for i in range(0,1000)])
+#     X2 = np.random.normal(0,1, X1.shape) * 200 
+# #    X2 = X1.copy() + noise
+#     X = np.concatenate((X1,X2), axis = 1)
+# 
+#     X = np.array([i for i in X if np.sum(i) < 400 or np.sum(i) >600])
+#     y = np.array([[0,] if np.sum(i) < 500 else [1,] for i in X])
+# =============================================================================
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state  = 1)
+          
+    # compute the parameters using self-built class or sklearn
+    C = Logistic_regression(X_train, y_train, 0.000005, 0, 50000)
+    
+    thetas, losses, Xs, Zs = C.gradient_descent()
+
+    clf = LogisticRegression()
+    clf = clf.fit(X_train, y_train.flatten())
+    print ("weight (Sk-learn):")
+    print (clf.intercept_, clf.coef_)    
+    print ("weight (self-built):")
+    print (thetas)
+
+    print ("sklearn accuracy: " + str(clf.score(X_test, y_test)))
+    print ("self-built accuracy: " + str(C.score(X_test, y_test)))    
+
+     # plot loss vs number of iteration for batch and stochastic
+    plt.figure()
+    plt.title("loss vs number of iteration")
+    plt.ylabel("loss")
+    plt.xlabel("number of iteration")
+    plt.grid()
+    plt.plot(list(losses.keys()), list(losses.values()), marker = "o", label = "batch gradient descent")
+
+
+    plt.legend()    
+    
+# =============================================================================
+#     # plot the graph of sklearn , my own algo to a 3d graph
+#     fig = plt.figure()
+#     ax1 = fig.gca(projection = "3d")    
+#     
+#     
+#     ax1.scatter([i[0] for i in X_test], [i[1] for i in X_test], y_test.flatten(), label = "test data", marker = "x", color = "k")
+#     ax1.scatter([i[0] for i in X_test], [i[1] for i in X_test], clf.predict(X_test), label = "sklearn logistic regression prediction")    
+#     
+#     ax1.scatter([i[0] for i in X_test], [i[1] for i in X_test], C.predict(X_test), label = "self-built logistic regression prediction")
+# #    ax1.plot([i for i in range(100)], [i for i in range(100)], D.predict(np.array([[1,i,i] for i in range(100)])), label = "self-built logistic regression - stochastic gradient descent", marker = "o")
+#    
+#     ax1.set_title("label vs X", fontsize = 20).set_position([0.5,1])
+#     ax1.set_xlabel("X1", fontsize = 20, labelpad = 20)
+#     ax1.set_ylabel("X2", fontsize = 20, labelpad = 20)
+#     ax1.set_zlabel("label", fontsize = 20, labelpad = 20)
+#     ax1.legend()
+#     
+#     
+#     
+# =============================================================================
+    # plot the correct and incorrect prediction 
+    plt.figure()
+    ax1 = plt.subplot(111)
+    ax1.scatter([i[0] for i in X_test],  [i[1] for i in X_test],  c = y_test.flatten() == C.predict(X_test) - 1, label = "prediction")
+    circle = plt.Line2D(range(1), range(1), color="yellow", marker='o')
+    circle1 = plt.Line2D(range(1), range(1), color="purple", marker='o')
+    ax1.legend([circle,circle1], ["incorrect", "correct"])
+    
+    D = Logistic_regression(X_train, y_train, 0.0005, 0, 100)
+    t, l, xs, zs = D.SGD()
+    D.score(X_test, y_test)
+     # plot loss vs number of iteration for stochastic
+    plt.figure()
+    plt.title("loss vs number of iteration")
+    plt.ylabel("loss")
+    plt.xlabel("number of iteration")
+    plt.grid()
+    plt.plot(list(l.keys()), list(l.values()), marker = "o", label = "batch gradient descent")    
+# =============================================================================
+#     
+#     # plot contour plot to map the path of gradient descent
+#     plt.figure()
+#     theta1, theta2, J  = C.cost_function(np.arange(-3.0,1.0,0.03), np.arange(-1.0,3.0,0.03))    
+#     ax1 = plt.contourf(theta1, theta2, J.T)
+#     plt.colorbar(ax1)
+#     b, x, y = np.hsplit(Xs, 3)
+#     plt.plot(x, y ,alpha = 0.7, label = "batch gradient descent")
+#     b, x, y = np.hsplit(xs, 3)
+#     plt.plot(x[::100], y[::100], linestyle = "--", color = "red", alpha = 0.7, label = "stochastic gradient descent")
+#     plt.legend()
+#     
+# =============================================================================
+    theta1, theta2, J  = C.cost_function(np.arange(-3.0,1.0,0.03), np.arange(-1.0,3.0,0.03))     
+    plt.figure(figsize = (12,8))
+    plt.xlabel("theta1")
+    plt.ylabel("theta2")   
+    ax1 = plt.contourf(theta1, theta2, J.T, levels = np.arange(0,5.6,0.05).tolist())
+    plt.colorbar(ax1)
+    b, x, y = np.hsplit(Xs, 3)
+    plt.plot(x, y ,alpha = 0.7, label = "batch gradient descent")
+    b, x, y = np.hsplit(xs, 3)
+    plt.plot(x[::100], y[::100], linestyle = "--", color = "red", alpha = 0.7, label = "stochastic gradient descent")
+    plt.legend()   
+    
+    
+
